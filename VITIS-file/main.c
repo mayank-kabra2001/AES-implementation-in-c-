@@ -207,7 +207,7 @@ unsigned char plaintext[16] = "ABCDEFGHIJKLMNOP";
 				printf("File reading: %d\n", result2);
 				printf("str: %s\n\r", plaintext);
 				int addr = XAes_encrypt_Get_plaintext_BaseAddress(&doencrypt);
-				XAes_encrypt_Set_Nr(&doencrypt, 14);
+				XAes_encrypt_Set_Nr(&doencrypt, 10);
 				XAes_encrypt_Write_plaintext_Bytes(&doencrypt, addr, plaintext, 16);
 				XAes_encrypt_Start(&doencrypt);
 				while(!XAes_encrypt_IsDone(&doencrypt));
