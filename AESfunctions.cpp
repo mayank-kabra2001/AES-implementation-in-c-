@@ -1,4 +1,3 @@
-// https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
 
 #include "AESfunctions.h"
 #include "AEStables.h"
@@ -177,6 +176,28 @@ void AddRoundKey(unsigned char* state, unsigned char* roundKey)
 }
 
 
+// Inverse Cipher
+void AES_Decrypt(unsigned char* ciphertext, unsigned char* expandedKey, unsigned short Nr, unsigned char* plaintext)
+{
+    // copy ciphertext into state
+    unsigned char state[stt_lng];
+    for (unsigned short i = 0; i < stt_lng; i++) { state[i] = ciphertext[i]; }
+
+    AddRoundKey(state, expandedKey + (stt_lng * Nr));  // Round Key
+
+    for (unsigned short i = 0; i < Nr; i++)
+    {
+        InvShiftRows(state);
+        InvSubBytes(state);
+        AddRoundKey(state, expandedKey + (stt_lng * (Nr - i - 1)));  // Round Key
+        if (i != (Nr - 1)) { InvMixColumns(state); }
+    }
+
+    // Copy state to plaintext
+    for (unsigned short i = 0; i < stt_lng; i++) { plaintext[i] = state[i]; }
+}
+
+
 // Cipher
 int AES_Encrypt(unsigned char plaintext[stt_lng], unsigned char expandedKey[ExtdCipherKeyLenghth_max], unsigned short Nr, unsigned char ciphertext[stt_lng])
 {
@@ -215,57 +236,3 @@ int AES_Encrypt(unsigned char plaintext[stt_lng], unsigned char expandedKey[Extd
 	return flag;
 }
 
-// Inverse Cipher
-void AES_Decrypt(unsigned char* ciphertext, unsigned char* expandedKey, unsigned short Nr, unsigned char* plaintext)
-{
-    // copy ciphertext into state
-    unsigned char state[stt_lng];
-    for (unsigned short i = 0; i < stt_lng; i++) { state[i] = ciphertext[i]; }
-
-    AddRoundKey(state, expandedKey + (stt_lng * Nr));  // Round Key
-
-    for (unsigned short i = 0; i < Nr; i++)
-    {
-        InvShiftRows(state);
-        InvSubBytes(state);
-        AddRoundKey(state, expandedKey + (stt_lng * (Nr - i - 1)));  // Round Key
-        if (i != (Nr - 1)) { InvMixColumns(state); }
-    }
-
-    // Copy state to plaintext
-    for (unsigned short i = 0; i < stt_lng; i++) { plaintext[i] = state[i]; }
-}
-
-/*
-
-Scratch area:
-
-// RotWord rotates left
-unsigned int* q = (unsigned int*)in4;
-*q = (*q >> 8) | ((*q & 0xff) << 24);
-// SubWord substitutes with S - Box value
-in4[0] = s_box[in4[0]];
-in4[1] = s_box[in4[1]];
-in4[2] = s_box[in4[2]];
-in4[3] = s_box[in4[3]];
-
-void printThisRoundKey(int r, unsigned char* RK)
-{
-    printf("round %d key: ", r);
-    for (int i = 0; i < 16; i++)
-    {
-        printf("%X ", RK[i]);
-    }
-    printf("\n");
-}
-
-void printState(unsigned char* state)
-{
-    for (int i = 0; i < 16; i++)
-    {
-        printf("%d ", state[i]);
-    }
-    printf(" state \n");
-}
-
-*/
